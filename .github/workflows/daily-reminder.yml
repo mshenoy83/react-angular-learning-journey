@@ -1,0 +1,45 @@
+name: Daily Learning Reminder
+on:
+  schedule:
+    # 7 PM AEST (9 AM UTC)
+    - cron: '0 9 * * *'
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  remind:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for open learning issues
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: '📚 study,🛠️ practice,🚀 project',
+              sort: 'created',
+              direction: 'asc',
+              per_page: 1
+            });
+            
+            if (issues.length > 0) {
+              const issue = issues[0];
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `🎯 **Daily Learning Reminder**
+                
+Hi there! 👋 Don't forget about today's learning session:
+
+**${issue.title}**
+
+Estimated time: Check the issue description for details.
+
+Good luck with your React/Angular journey! 🚀
+
+---
+*This is an automated reminder. Disable it by deleting the workflow file.*`
+              });
+            }
