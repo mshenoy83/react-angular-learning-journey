@@ -33,7 +33,7 @@ jobs:
                 
 Hi there! 👋 Don't forget about today's learning session:
 
-**${issue.title}**
+**$${issue.title}**
 
 Estimated time: Check the issue description for details.
 
